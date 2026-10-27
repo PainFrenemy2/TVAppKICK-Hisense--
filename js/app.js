@@ -4,7 +4,7 @@
   var h = U.h;
 
   var App = {
-    VERSION: '1.0.0',
+    VERSION: '1.0.1',
     layers: [],
     history: [],
     pendingFocus: false
@@ -95,6 +95,30 @@
     else { list.unshift(login); UI.toast(tr('Добавлено в избранное')); }
     App.setFavs(list);
     return i < 0;
+  };
+
+  // Избранное из файла favorites.txt в репозитории: каналы можно вписать с телефона на GitHub —
+  // приложение добавит их само. Добавляем только новые строки файла (что уже подтягивали — помним),
+  // поэтому канал, удалённый из избранного на ТВ, из файла обратно не вернётся.
+  App.syncFavFile = function () {
+    if (!window.fetch) return Promise.resolve(0);
+    return fetch('favorites.txt?t=' + Date.now(), { cache: 'no-store' }).then(function (r) { return r.ok ? r.text() : ''; }).then(function (t) {
+      var seen = U.store.get('favFileSeen', {}), list = App.favs(), added = 0;
+      String(t).split(/\r?\n/).forEach(function (line) {
+        line = line.replace(/#.*/, '').trim();
+        if (!line) return;
+        // можно вписать и ник, и ссылку: kick.com/xqc
+        var m = /(?:kick\.com\/)?([A-Za-z0-9_\-]+)\/?$/.exec(line);
+        if (!m) return;
+        var login = m[1].toLowerCase();
+        if (seen[login]) return;
+        seen[login] = 1;
+        if (list.indexOf(login) < 0) { list.push(login); added++; }
+      });
+      U.store.set('favFileSeen', seen);
+      if (added) { App.setFavs(list); UI.toast(tr('Из favorites.txt добавлено каналов: ') + added, 4000); }
+      return added;
+    }).catch(function () { return 0; });
   };
 
   // ---------- заблокированные каналы (локально: скрываются из всех списков, чата и «Другие каналы») ----------
@@ -553,6 +577,7 @@
   setInterval(function () { if (!document.hidden) checkUpdate(); }, 5 * 60 * 1000);
 
   function start() {
+    setTimeout(App.syncFavFile, 3000);
     App.applyScale();
     App.applyLite();
     U.$$('[data-i18n]').forEach(function (el) { el.textContent = tr(el.textContent); });

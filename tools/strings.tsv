@@ -398,3 +398,5 @@ Kick пока не даёт сторонним приложениям вход �
 дарит подписки:	дарує підписки:	gifted subs:
 оформил(а) подписку	оформив(-ла) підписку	subscribed
 чат недоступен	чат недоступний	chat unavailable
+Из favorites.txt добавлено каналов: 	З favorites.txt додано каналів: 	Channels added from favorites.txt: 
+Можно вписать каналы и с телефона: файл favorites.txt в репозитории приложения на GitHub — по одному нику в строке, приложение добавит их само.	Можна вписати канали й з телефона: файл favorites.txt у репозиторії застосунку на GitHub — по одному ніку в рядку, застосунок додасть їх сам.	You can also add channels from your phone: the favorites.txt file in the app repository on GitHub — one username per line, the app adds them by itself.
